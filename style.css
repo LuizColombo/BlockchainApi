@@ -180,3 +180,65 @@ footer {
         width: 15vw;
     }
 }
+
+@media (max-width: 1200px){
+    button {
+        width: 7vw;
+    }
+}
+
+@media(max-width: 945px){
+    button{
+        width: 10vw;
+    }
+
+    input[type="search"]{
+        width: 70vw;
+    }
+
+    #lbl_wallet {
+        margin-left: 1px;
+    }
+
+    #lbl_transaction {
+        margin-left: 1px;
+    }
+}
+
+@media(max-width: 648px){
+    button{
+        width: 12vw;
+    }
+    input[type="search"]{
+        width: 60vw;
+    }
+
+    #container_results {
+        width: 90vw;
+    }
+
+    #container_results p {
+        width: 80vw;
+    }
+
+    #wallet_transactions_list{
+        width: 88vw;
+        
+    }
+
+    #wallet_transactions_list li{
+        width: 80vw;
+        background-color: #444;
+        text-align: left;
+    }
+}
+
+@media(max-width: 500px){
+    button{
+        width: 14vw;
+    }
+
+    #wallet_transactions_list li{
+        background-color: #444;
+    }
+}
