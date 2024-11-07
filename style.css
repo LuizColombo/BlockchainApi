@@ -242,3 +242,48 @@ footer {
         background-color: #444;
     }
 }
+
+@media(max-width: 430px){
+    button{
+        width: 14vw;
+        font-size: 13px;
+    }
+
+    #lbl_wallet{
+        margin-right: 140px;
+        padding-bottom: 2px;
+    }
+    #lbl_transaction{
+        margin-right: 140px;
+        padding-bottom: 2px;
+    }
+
+    #input_wallet_address{
+        width: 78vw;
+    }
+
+    #input_transaction_address{
+        width: 78vw;
+    }
+
+    #container_results {
+        width: 87vw;
+    }
+
+    #container_results p {
+        width: 80vw;
+    }
+
+    #wallet_transactions_list{
+        width: 87vw;
+        
+        
+    }
+
+    #wallet_transactions_list li{
+        width: 78vw;
+        background-color: #444;
+        text-align: left;
+        word-wrap: break-word;
+    }
+}
