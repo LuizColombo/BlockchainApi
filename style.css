@@ -252,26 +252,27 @@ footer {
 }
 
 @media(max-width: 430px){
+    .icon {
+        width: 30px; 
+        height: auto; 
+    }
     button{
         width: 14vw;
         font-size: 13px;
+        margin: 5px 0;
     }
 
-    #lbl_wallet{
-        margin-right: 140px;
-        padding-bottom: 2px;
-    }
-    #lbl_transaction{
-        margin-right: 140px;
-        padding-bottom: 2px;
+    #lbl_wallet, #lbl_transaction {
+        padding: 10px;
+        display: block; 
+        width: 21vw;
+        margin-bottom: 5px; 
     }
 
-    #input_wallet_address{
-        width: 78vw;
-    }
-
-    #input_transaction_address{
-        width: 78vw;
+    #input_wallet_address, #input_transaction_address {
+        width: 100%; 
+        max-width: 78vw; 
+        margin-bottom: 10px; 
     }
 
     #container_results {
@@ -284,8 +285,6 @@ footer {
 
     #wallet_transactions_list{
         width: 87vw;
-        
-        
     }
 
     #wallet_transactions_list li{
