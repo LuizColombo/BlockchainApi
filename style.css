@@ -257,7 +257,7 @@ footer {
         height: auto; 
     }
     button{
-        width: 14vw;
+        width: 17vw;
         font-size: 13px;
         margin: 5px 0;
     }
@@ -265,14 +265,14 @@ footer {
     #lbl_wallet, #lbl_transaction {
         padding: 10px;
         display: block; 
-        width: 20vw;
+        width: 25vw;
         margin-bottom: 10px; 
         margin-top: 10px; 
     }
 
     #input_wallet_address, #input_transaction_address {
         width: 100%; 
-        max-width: 78vw; 
+        max-width: 75vw; 
         margin-bottom: 10px; 
     }
 
