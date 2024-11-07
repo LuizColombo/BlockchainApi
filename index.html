@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Blockchain Api</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <form id="form_wallet">
+        <div id="main_container">
+            <h1>Blockchain Api</h1>
+            <h2>Digite um endereço de carteira ou Hash de Transação</h2>
+            <label id="lbl_wallet" for="input_wallet_address">Address:</label>
+            <input type="search" placeholder="Wallet Address" id="input_wallet_address" class="inputs">
+            <button type="submit" id="btn_search_wallet" class="btns">Search</button>
+
+            <label id="lbl_transaction" for="input_transaction_address">Transaction:</label>
+            <input type="search" placeholder="Transaction Address" id="input_transaction_address" class="inputs">
+            <button type="submit" id="btn_search_transaction" class="btns">Search</button>
+        </div>
+    </form>
+
+    <div id="container_results" style="display: none;">
+        <p id="wallet_address">wallet_address</p>
+        <p id="wallet_nr_transactions">wallet_nr_transactions</p>
+        <p id="wallet_total_received">wallet_total_received</p>
+        <p id="wallet_total_sent">wallet_total_sent</p>
+        <p id="final_balance">final_balance</p>
+
+        <ul id="wallet_transactions_list">
+            <!-- será preenchida dinamicamente -->
+        </ul>
+    </div>
+
+    <p id="error_search" style="display: none;">teste</p>
+
+    <script src="script.js" async defer></script>
+
+</body>
+
+<footer>
+    <p>&copy; Luiz Colombo | colombo.devops@gmail.com</p>
+</footer>
+
+</html>
