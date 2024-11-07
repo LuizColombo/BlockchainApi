@@ -265,8 +265,9 @@ footer {
     #lbl_wallet, #lbl_transaction {
         padding: 10px;
         display: block; 
-        width: 21vw;
-        margin-bottom: 5px; 
+        width: 20vw;
+        margin-bottom: 10px; 
+        margin-top: 10px; 
     }
 
     #input_wallet_address, #input_transaction_address {
