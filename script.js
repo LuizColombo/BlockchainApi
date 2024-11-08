@@ -127,6 +127,16 @@ async function walletSearch(input_wallet) {
 
     // Verifica cache
     const cachedData = sessionStorage.getItem(input_wallet);
+
+    document.getElementById("convert_button").addEventListener("click", () => {
+        const cachedData = sessionStorage.getItem(input_wallet);
+        if (cachedData) {
+            exportToXLSX(JSON.parse(cachedData));
+        } else {
+            alert("Por favor, faça uma busca antes de exportar.");
+        }
+    });
+
     if (cachedData) {
         return renderWalletData(JSON.parse(cachedData));
     }
@@ -240,4 +250,35 @@ function renderTransactionData(data) {
             container.appendChild(pValue);
         });
     }
+}
+
+function exportToXLSX(data) {
+    // Define os dados para o arquivo Excel
+    const workbook = XLSX.utils.book_new();
+    
+    // Dados principais da carteira
+    const walletData = [
+        ["Wallet Address", data.address],
+        ["Nº of Transactions", data.n_tx],
+        ["Total Received", (data.total_received / 100000000).toFixed(8)],
+        ["Total Sent", (data.total_sent / 100000000).toFixed(8)],
+        ["Final Balance", (data.final_balance / 100000000).toFixed(8)],
+    ];
+    
+    const walletSheet = XLSX.utils.aoa_to_sheet(walletData);
+    XLSX.utils.book_append_sheet(workbook, walletSheet, "Wallet Info");
+    
+    // Dados das transações
+    const transactionsData = data.txs.map(transaction => [
+        transaction.hash,
+        new Date(transaction.time * 1000).toLocaleString()
+    ]);
+    
+    transactionsData.unshift(["Transaction Hash", "Date"]); // Cabeçalhos da tabela
+    
+    const transactionSheet = XLSX.utils.aoa_to_sheet(transactionsData);
+    XLSX.utils.book_append_sheet(workbook, transactionSheet, "Transactions");
+
+    // Cria e salva o arquivo
+    XLSX.writeFile(workbook, `Wallet_${data.address}.xlsx`);
 }

@@ -129,6 +129,10 @@ button:active {
     transform: translateY(1px);
 }
 
+#convert_button{
+    width: auto;
+}
+
 #error_search {
     text-align: center;
     padding: 20px;
