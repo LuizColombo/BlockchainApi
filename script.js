@@ -21,6 +21,7 @@ formulario.addEventListener('submit', function (event) {
 
 function walletSearch(input_wallet) {
     console.log("Entrou na função walletSearch");
+    console.log("Addr: " + input_wallet);
     let url_api = `https://blockchain.info/rawaddr/${input_wallet}`;
 
     const ul = document.getElementById("wallet_transactions_list");
@@ -47,13 +48,16 @@ function walletSearch(input_wallet) {
 
                 data.txs.forEach((transaction) => {
                     const li = document.createElement("li");
-                    
+
                     li.innerHTML = `
                         Hash da Transação: ${transaction.hash} <br>
                         Data: ${new Date(transaction.time * 1000).toLocaleString()}
                     `;
-                    
-                    // Adiciona o item de lista à lista
+
+                    li.onclick = function () {
+                        transactionSearch(transaction.hash);
+                    };
+
                     ul.appendChild(li);
                 });
             }
@@ -63,43 +67,46 @@ function walletSearch(input_wallet) {
         });
 }
 
-function transactionSearch(input_transaction){
-    console.log("Entrou na função transactionSearch");
+function transactionSearch(input_transaction) {
     let url_transaction = `https://blockchain.info/rawtx/${input_transaction}`
 
     fetch(url_transaction)
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data);
-        document.getElementById('container_results').style.display = "none";
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            document.getElementById('container_results').style.display = "none";
 
-        if (data.error) {
-            document.getElementById('error_search').style.display = "block";
-            document.getElementById('error_search').innerHTML = "Error: " + data.message;
-        }
-        else {
-             document.getElementById('error_search').style.display = "none";
-             document.getElementById('container_results_transaction').style.display = "block";
+            if (data.error) {
+                document.getElementById('error_search').style.display = "block";
+                document.getElementById('error_search').innerHTML = "Error: " + data.message;
+            }
+            else {
+                document.getElementById('error_search').style.display = "none";
+                document.getElementById('container_results_transaction').style.display = "block";
 
-             document.getElementById('transaction_id').innerHTML = "<strong>Hash:</strong> " + data.hash;
+                document.getElementById('transaction_id').innerHTML = "<strong>Hash:</strong> " + data.hash;
 
-            data.out.forEach(output => {
-                let pAddress = document.createElement('p');
-                pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
-                document.getElementById('container_results_transaction').appendChild(pAddress);
+                data.out.forEach(output => {
+                    let pAddress = document.createElement('p');
+                    pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
+                    document.getElementById('container_results_transaction').appendChild(pAddress);
 
-                let pValue = document.createElement('p');
-                pValue.innerHTML = `<strong>Value:</strong> ${(output.value / 100000000).toFixed(8)} `;
-                document.getElementById('container_results_transaction').appendChild(pValue);
-            });
-             
-             document.getElementById('transaction_date').innerHTML = `<strong>Date:</strong> ${new Date(data.time * 1000).toLocaleString()}`;
-             document.getElementById('transaction_block_id').innerHTML = "<strong>Block ID:</strong> " + data.block_index;
-             document.getElementById('transaction_fee').innerHTML = "<strong>Fee:</strong> " + (data.fee / 100000000).toFixed(8);
-             
-        }
-    })
-    .catch((error) => {
-        console.error("Erro:", error);
-    });
+                    let pValue = document.createElement('p');
+                    pValue.innerHTML = `<strong>Value:</strong> ${(output.value / 100000000).toFixed(8)} `;
+                    document.getElementById('container_results_transaction').appendChild(pValue);
+
+                    pAddress.onclick = function () {
+                        walletSearch(output.addr);
+                    };
+                });
+
+                document.getElementById('transaction_date').innerHTML = `<strong>Date:</strong> ${new Date(data.time * 1000).toLocaleString()}`;
+                document.getElementById('transaction_block_id').innerHTML = "<strong>Block ID:</strong> " + data.block_index;
+                document.getElementById('transaction_fee').innerHTML = "<strong>Fee:</strong> " + (data.fee / 100000000).toFixed(8);
+
+            }
+        })
+        .catch((error) => {
+            console.error("Erro:", error);
+        });
 }

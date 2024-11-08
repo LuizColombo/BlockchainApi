@@ -26,7 +26,7 @@ html {
 #container_results_transaction {
     text-align: justify;
     background-color: rgba(0, 0, 0, 0.404);
-    width: 45vw;
+    width: 55vw;
     margin: 0 0 0 10px;
     border-radius: 15px;
     padding-left: 20px;
@@ -35,14 +35,14 @@ html {
 
 #container_results p,
 #container_results_transaction p {
-    text-align: left;
-    width: 41vw;
+    text-align: center;
+    width: auto;
+    height: auto;
     padding: 5px;
     background-color: #444;    
-    margin-left: 20px;
+    margin-left: 10px;
     border: 2px solid #444;
     border-radius: 10px;
-
 }
 
 #wallet_transactions_list {
@@ -58,7 +58,7 @@ html {
     text-align: left;
     padding: 20px;
     background-color: #444;    
-    width: 40vw;
+    width: auto;
     margin: 10px 0 0 0;
     border-radius: 15px;
     cursor: pointer;
