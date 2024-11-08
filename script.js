@@ -1,5 +1,6 @@
+let controller;
+let transactionController;
 const formulario = document.getElementById('form_wallet');
-// 3BTbmmRubF8uwVb4UFuYcckX2soKDWjiyi
 
 formulario.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -19,7 +20,99 @@ formulario.addEventListener('submit', function (event) {
     }
 });
 
-function walletSearch(input_wallet) {
+// function walletSearch(input_wallet) {
+//     console.log("Entrou na função walletSearch");
+//     console.log("Addr: " + input_wallet);
+//     let url_api = `https://blockchain.info/rawaddr/${input_wallet}`;
+
+//     const ul = document.getElementById("wallet_transactions_list");
+//     ul.innerHTML = "";
+
+//     fetch(url_api)
+//         .then((response) => response.json())
+//         .then((data) => {
+//             document.getElementById('container_results_transaction').style.display = "none";
+//             console.log(data);
+
+//             if (data.error) {
+//                 document.getElementById('error_search').style.display = "block";
+//                 document.getElementById('error_search').innerHTML = "Error: " + data.message;
+//             }
+//             else {
+//                 document.getElementById('error_search').style.display = "none";
+//                 document.getElementById('container_results').style.display = "block";
+//                 document.getElementById('wallet_address').innerHTML = "<strong>Wallet Address:</strong> " + data.address;
+//                 document.getElementById('wallet_nr_transactions').innerHTML = "<strong>Nº of Transactions:</strong> " + data.n_tx;
+//                 document.getElementById('wallet_total_received').innerHTML = "<strong>Total Received:</strong> " + data.total_received / 100000000;
+//                 document.getElementById('wallet_total_sent').innerHTML = "<strong>Total Sent:</strong> " + data.total_sent / 100000000;
+//                 document.getElementById('final_balance').innerHTML = "<strong>Final Balance:</strong> " + data.final_balance / 100000000;
+
+//                 data.txs.forEach((transaction) => {
+//                     const li = document.createElement("li");
+
+//                     li.innerHTML = `
+//                         Hash da Transação: ${transaction.hash} <br>
+//                         Data: ${new Date(transaction.time * 1000).toLocaleString()}
+//                     `;
+
+//                     li.onclick = function () {
+//                         transactionSearch(transaction.hash);
+//                     };
+
+//                     ul.appendChild(li);
+//                 });
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Erro:", error);
+//         });
+// }
+
+// function transactionSearch(input_transaction) {
+//     let url_transaction = `https://blockchain.info/rawtx/${input_transaction}`
+
+//     fetch(url_transaction)
+//         .then((response) => response.json())
+//         .then((data) => {
+//             console.log(data);
+//             document.getElementById('container_results').style.display = "none";
+
+//             if (data.error) {
+//                 document.getElementById('error_search').style.display = "block";
+//                 document.getElementById('error_search').innerHTML = "Error: " + data.message;
+//             }
+//             else {
+//                 document.getElementById('error_search').style.display = "none";
+//                 document.getElementById('container_results_transaction').style.display = "block";
+
+//                 document.getElementById('transaction_id').innerHTML = "<strong>Hash:</strong> " + data.hash;
+
+//                 data.out.forEach(output => {
+//                     let pAddress = document.createElement('p');
+//                     pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
+//                     document.getElementById('container_results_transaction').appendChild(pAddress);
+
+//                     let pValue = document.createElement('p');
+//                     pValue.innerHTML = `<strong>Value:</strong> ${(output.value / 100000000).toFixed(8)} `;
+//                     document.getElementById('container_results_transaction').appendChild(pValue);
+
+//                     pAddress.onclick = function () {
+//                         walletSearch(output.addr);
+//                     };
+//                 });
+
+//                 document.getElementById('transaction_date').innerHTML = `<strong>Date:</strong> ${new Date(data.time * 1000).toLocaleString()}`;
+//                 document.getElementById('transaction_block_id').innerHTML = "<strong>Block ID:</strong> " + data.block_index;
+//                 document.getElementById('transaction_fee').innerHTML = "<strong>Fee:</strong> " + (data.fee / 100000000).toFixed(8);
+
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Erro:", error);
+//         });
+// }
+
+async function walletSearch(input_wallet) {
     console.log("Entrou na função walletSearch");
     console.log("Addr: " + input_wallet);
     let url_api = `https://blockchain.info/rawaddr/${input_wallet}`;
@@ -27,86 +120,124 @@ function walletSearch(input_wallet) {
     const ul = document.getElementById("wallet_transactions_list");
     ul.innerHTML = "";
 
-    fetch(url_api)
-        .then((response) => response.json())
-        .then((data) => {
-            document.getElementById('container_results_transaction').style.display = "none";
-            console.log(data);
+    // Se já existe uma requisição anterior, cancela antes de iniciar uma nova
+    if (controller) controller.abort();
+    controller = new AbortController();
+    const { signal } = controller;
 
-            if (data.error) {
-                document.getElementById('error_search').style.display = "block";
-                document.getElementById('error_search').innerHTML = "Error: " + data.message;
-            }
-            else {
-                document.getElementById('error_search').style.display = "none";
-                document.getElementById('container_results').style.display = "block";
-                document.getElementById('wallet_address').innerHTML = "<strong>Wallet Address:</strong> " + data.address;
-                document.getElementById('wallet_nr_transactions').innerHTML = "<strong>Nº of Transactions:</strong> " + data.n_tx;
-                document.getElementById('wallet_total_received').innerHTML = "<strong>Total Received:</strong> " + data.total_received / 100000000;
-                document.getElementById('wallet_total_sent').innerHTML = "<strong>Total Sent:</strong> " + data.total_sent / 100000000;
-                document.getElementById('final_balance').innerHTML = "<strong>Final Balance:</strong> " + data.final_balance / 100000000;
+    // Verifica cache
+    const cachedData = sessionStorage.getItem(input_wallet);
+    if (cachedData) {
+        return renderWalletData(JSON.parse(cachedData));
+    }
 
-                data.txs.forEach((transaction) => {
-                    const li = document.createElement("li");
+    try {
+        const response = await fetch(url_api, { signal });
+        if (!response.ok) throw new Error("Falha ao buscar dados da API");
 
-                    li.innerHTML = `
-                        Hash da Transação: ${transaction.hash} <br>
-                        Data: ${new Date(transaction.time * 1000).toLocaleString()}
-                    `;
+        const data = await response.json();
 
-                    li.onclick = function () {
-                        transactionSearch(transaction.hash);
-                    };
+        // Armazena no cache da sessão
+        sessionStorage.setItem(input_wallet, JSON.stringify(data));
 
-                    ul.appendChild(li);
-                });
-            }
-        })
-        .catch((error) => {
-            console.error("Erro:", error);
-        });
+        renderWalletData(data);
+    } catch (error) {
+        console.error("Erro:", error);
+        document.getElementById('error_search').style.display = "block";
+        document.getElementById('error_search').innerHTML = "Erro ao buscar informações da carteira.";
+    }
 }
 
-function transactionSearch(input_transaction) {
-    let url_transaction = `https://blockchain.info/rawtx/${input_transaction}`
+function renderWalletData(data) {
+    document.getElementById('container_results_transaction').style.display = "none";
 
-    fetch(url_transaction)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-            document.getElementById('container_results').style.display = "none";
+    if (data.error) {
+        document.getElementById('error_search').style.display = "block";
+        document.getElementById('error_search').innerHTML = "Error: " + data.message;
+    } else {
+        document.getElementById('error_search').style.display = "none";
+        document.getElementById('container_results').style.display = "block";
+        document.getElementById('wallet_address').innerHTML = `<strong>Wallet Address:</strong> ${data.address}`;
+        document.getElementById('wallet_nr_transactions').innerHTML = `<strong>Nº of Transactions:</strong> ${data.n_tx}`;
+        document.getElementById('wallet_total_received').innerHTML = `<strong>Total Received:</strong> ${(data.total_received / 100000000).toFixed(8)}`;
+        document.getElementById('wallet_total_sent').innerHTML = `<strong>Total Sent:</strong> ${(data.total_sent / 100000000).toFixed(8)}`;
+        document.getElementById('final_balance').innerHTML = `<strong>Final Balance:</strong> ${(data.final_balance / 100000000).toFixed(8)}`;
 
-            if (data.error) {
-                document.getElementById('error_search').style.display = "block";
-                document.getElementById('error_search').innerHTML = "Error: " + data.message;
-            }
-            else {
-                document.getElementById('error_search').style.display = "none";
-                document.getElementById('container_results_transaction').style.display = "block";
+        const ul = document.getElementById("wallet_transactions_list");
+        data.txs.forEach((transaction) => {
+            const li = document.createElement("li");
 
-                document.getElementById('transaction_id').innerHTML = "<strong>Hash:</strong> " + data.hash;
+            li.innerHTML = `
+                Hash da Transação: ${transaction.hash} <br>
+                Data: ${new Date(transaction.time * 1000).toLocaleString()}
+            `;
 
-                data.out.forEach(output => {
-                    let pAddress = document.createElement('p');
-                    pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
-                    document.getElementById('container_results_transaction').appendChild(pAddress);
+            li.onclick = () => transactionSearch(transaction.hash);
 
-                    let pValue = document.createElement('p');
-                    pValue.innerHTML = `<strong>Value:</strong> ${(output.value / 100000000).toFixed(8)} `;
-                    document.getElementById('container_results_transaction').appendChild(pValue);
-
-                    pAddress.onclick = function () {
-                        walletSearch(output.addr);
-                    };
-                });
-
-                document.getElementById('transaction_date').innerHTML = `<strong>Date:</strong> ${new Date(data.time * 1000).toLocaleString()}`;
-                document.getElementById('transaction_block_id').innerHTML = "<strong>Block ID:</strong> " + data.block_index;
-                document.getElementById('transaction_fee').innerHTML = "<strong>Fee:</strong> " + (data.fee / 100000000).toFixed(8);
-
-            }
-        })
-        .catch((error) => {
-            console.error("Erro:", error);
+            ul.appendChild(li);
         });
+    }
+}
+
+async function transactionSearch(input_transaction) {
+    console.log("Iniciando busca de transação:", input_transaction);
+    let url_transaction = `https://blockchain.info/rawtx/${input_transaction}`;
+
+    // Se já existe uma requisição anterior, cancela antes de iniciar uma nova
+    if (transactionController) transactionController.abort();
+    transactionController = new AbortController();
+    const { signal } = transactionController;
+
+    // Verifica se já existe cache
+    const cachedData = sessionStorage.getItem(input_transaction);
+    if (cachedData) {
+        return renderTransactionData(JSON.parse(cachedData));
+    }
+
+    try {
+        const response = await fetch(url_transaction, { signal });
+        if (!response.ok) throw new Error("Erro ao buscar dados da transação");
+
+        const data = await response.json();
+
+        // Armazena no cache
+        sessionStorage.setItem(input_transaction, JSON.stringify(data));
+
+        renderTransactionData(data);
+    } catch (error) {
+        console.error("Erro:", error);
+        document.getElementById('error_search').style.display = "block";
+        document.getElementById('error_search').innerHTML = "Erro ao buscar informações da transação.";
+    }
+}
+
+function renderTransactionData(data) {
+    document.getElementById('container_results').style.display = "none";
+
+    if (data.error) {
+        document.getElementById('error_search').style.display = "block";
+        document.getElementById('error_search').innerHTML = "Error: " + data.message;
+    } else {
+        document.getElementById('error_search').style.display = "none";
+        document.getElementById('container_results_transaction').style.display = "block";
+        document.getElementById('transaction_id').innerHTML = `<strong>Hash:</strong> ${data.hash}`;
+        document.getElementById('transaction_date').innerHTML = `<strong>Date:</strong> ${new Date(data.time * 1000).toLocaleString()}`;
+        document.getElementById('transaction_block_id').innerHTML = `<strong>Block ID:</strong> ${data.block_index}`;
+        document.getElementById('transaction_fee').innerHTML = `<strong>Fee:</strong> ${(data.fee / 100000000).toFixed(8)}`;
+
+        const container = document.getElementById('container_results_transaction');
+        container.innerHTML = ""; // Limpa conteúdo antigo
+
+        data.out.forEach(output => {
+            const pAddress = document.createElement('p');
+            pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
+            pAddress.onclick = () => walletSearch(output.addr);
+
+            const pValue = document.createElement('p');
+            pValue.innerHTML = `<strong>Value:</strong> ${(output.value / 100000000).toFixed(8)}`;
+
+            container.appendChild(pAddress);
+            container.appendChild(pValue);
+        });
+    }
 }
