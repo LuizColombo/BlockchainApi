@@ -112,10 +112,60 @@ formulario.addEventListener('submit', function (event) {
 //         });
 // }
 
+// async function walletSearch(input_wallet) {
+//     console.log("Entrou na função walletSearch");
+//     console.log("Addr: " + input_wallet);
+//     let url_api = `https://blockchain.info/rawaddr/${input_wallet}`;
+
+//     const ul = document.getElementById("wallet_transactions_list");
+//     ul.innerHTML = "";
+
+//     // Se já existe uma requisição anterior, cancela antes de iniciar uma nova
+//     if (controller) controller.abort();
+//     controller = new AbortController();
+//     const { signal } = controller;
+
+//     // Verifica cache
+//     const cachedData = sessionStorage.getItem(input_wallet);
+
+//     document.getElementById("convert_button").addEventListener("click", () => {
+//         const cachedData = sessionStorage.getItem(input_wallet);
+//         if (cachedData) {
+//             exportToXLSX(JSON.parse(cachedData));
+//         } else {
+//             alert("Por favor, faça uma busca antes de exportar.");
+//         }
+//     });
+
+//     if (cachedData) {
+//         return renderWalletData(JSON.parse(cachedData));
+//     }
+
+//     try {
+//         const response = await fetch(url_api, { signal });
+//         if (!response.ok) throw new Error("Falha ao buscar dados da API");
+
+//         const data = await response.json();
+
+//         // Armazena no cache da sessão
+//         sessionStorage.setItem(input_wallet, JSON.stringify(data));
+
+//         renderWalletData(data);
+//     } catch (error) {
+//         console.error("Erro:", error);
+//         document.getElementById('error_search').style.display = "block";
+//         document.getElementById('error_search').innerHTML = "Erro ao buscar informações da carteira.";
+//     }
+// }
+
 async function walletSearch(input_wallet) {
     console.log("Entrou na função walletSearch");
     console.log("Addr: " + input_wallet);
-    let url_api = `https://blockchain.info/rawaddr/${input_wallet}`;
+    const limit = 50;
+    let offset = 0;
+    let allTransactions = [];
+    let hasMoreTransactions = true;
+    let data = null; // Armazenará a resposta inicial da API
 
     const ul = document.getElementById("wallet_transactions_list");
     ul.innerHTML = "";
@@ -142,15 +192,31 @@ async function walletSearch(input_wallet) {
     }
 
     try {
-        const response = await fetch(url_api, { signal });
-        if (!response.ok) throw new Error("Falha ao buscar dados da API");
+        while (hasMoreTransactions) {
+            let url_api = `https://blockchain.info/rawaddr/${input_wallet}?limit=${limit}&offset=${offset}`;
+            const response = await fetch(url_api, { signal });
 
-        const data = await response.json();
+            if (!response.ok) throw new Error("Falha ao buscar dados da API");
+
+            const newData = await response.json();
+
+            // Armazena os dados gerais da resposta inicial
+            if (!data) data = newData;
+
+            // Adiciona as transações obtidas ao array allTransactions
+            allTransactions = allTransactions.concat(newData.txs);
+
+            // Verifica se há mais transações para buscar
+            hasMoreTransactions = newData.txs.length === limit;
+            offset += limit; // Incrementa o offset para a próxima "página"
+        }
 
         // Armazena no cache da sessão
-        sessionStorage.setItem(input_wallet, JSON.stringify(data));
+        sessionStorage.setItem(input_wallet, JSON.stringify({ ...data, txs: allTransactions }));
 
-        renderWalletData(data);
+        // Renderiza os dados com todas as transações
+        renderWalletData({ ...data, txs: allTransactions });
+
     } catch (error) {
         console.error("Erro:", error);
         document.getElementById('error_search').style.display = "block";
@@ -255,7 +321,7 @@ function renderTransactionData(data) {
 function exportToXLSX(data) {
     // Define os dados para o arquivo Excel
     const workbook = XLSX.utils.book_new();
-    
+
     // Dados principais da carteira
     const walletData = [
         ["Wallet Address", data.address],
@@ -264,18 +330,18 @@ function exportToXLSX(data) {
         ["Total Sent", (data.total_sent / 100000000).toFixed(8)],
         ["Final Balance", (data.final_balance / 100000000).toFixed(8)],
     ];
-    
+
     const walletSheet = XLSX.utils.aoa_to_sheet(walletData);
     XLSX.utils.book_append_sheet(workbook, walletSheet, "Wallet Info");
-    
+
     // Dados das transações
     const transactionsData = data.txs.map(transaction => [
         transaction.hash,
         new Date(transaction.time * 1000).toLocaleString()
     ]);
-    
+
     transactionsData.unshift(["Transaction Hash", "Date"]); // Cabeçalhos da tabela
-    
+
     const transactionSheet = XLSX.utils.aoa_to_sheet(transactionsData);
     XLSX.utils.book_append_sheet(workbook, transactionSheet, "Transactions");
 
