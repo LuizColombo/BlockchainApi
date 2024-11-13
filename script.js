@@ -159,8 +159,7 @@ formulario.addEventListener('submit', function (event) {
 // }
 
 async function walletSearch(input_wallet) {
-    console.log("Entrou na função walletSearch");
-    console.log("Addr: " + input_wallet);
+
     const limit = 50;
     let offset = 0;
     let allTransactions = [];
@@ -226,6 +225,7 @@ async function walletSearch(input_wallet) {
 
 function renderWalletData(data) {
     document.getElementById('container_results_transaction').style.display = "none";
+    document.getElementById('convert_button').style.display = "block";
 
     if (data.error) {
         document.getElementById('error_search').style.display = "block";
@@ -289,6 +289,7 @@ async function transactionSearch(input_transaction) {
 
 function renderTransactionData(data) {
     document.getElementById('container_results').style.display = "none";
+    document.getElementById('convert_button').style.display = "none";
 
     if (data.error) {
         document.getElementById('error_search').style.display = "block";
