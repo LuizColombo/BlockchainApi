@@ -66,7 +66,7 @@ function walletSearch(input_wallet) {
                 });
 
                 document.getElementById("convert_button").addEventListener("click", () => {
-                    exportToXLSX(JSON.parse(data));
+                    exportToXLSX(data);
                 });
             }
         })
