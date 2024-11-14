@@ -178,9 +178,9 @@ async function walletSearch(input_wallet) {
     const cachedData = sessionStorage.getItem(input_wallet);
 
     document.getElementById("convert_button").addEventListener("click", () => {
-        const cachedData = sessionStorage.getItem(input_wallet);
-        if (cachedData) {
-            exportToXLSX(JSON.parse(cachedData));
+        const exportData = sessionStorage.getItem(input_wallet);
+        if (exportData) {
+            exportToXLSX(JSON.parse(exportData));
         } else {
             alert("Por favor, faça uma busca antes de exportar.");
         }
@@ -295,6 +295,7 @@ function renderTransactionData(data) {
         document.getElementById('error_search').style.display = "block";
         document.getElementById('error_search').innerHTML = "Error: " + data.message;
     } else {
+        console.log(data);
         document.getElementById('error_search').style.display = "none";
         document.getElementById('container_results_transaction').style.display = "block";
         document.getElementById('transaction_id').innerHTML = `<strong>Hash:</strong> ${data.hash}`;
@@ -303,11 +304,11 @@ function renderTransactionData(data) {
         document.getElementById('transaction_fee').innerHTML = `<strong>Fee:</strong> ${(data.fee / 100000000).toFixed(8)}`;
 
         const container = document.getElementById('container_results_transaction');
-        container.innerHTML = ""; // Limpa conteúdo antigo
 
         data.out.forEach(output => {
             const pAddress = document.createElement('p');
             pAddress.innerHTML = `<strong>Wallet Address:</strong> ${output.addr}`;
+
             pAddress.onclick = () => walletSearch(output.addr);
 
             const pValue = document.createElement('p');
