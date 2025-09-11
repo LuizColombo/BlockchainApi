@@ -41,14 +41,14 @@ Exemplos de servidor simples:
     npx http-server
 
 🧩 Estrutura do projeto
-
+```text
 BlockchainApi/
 ├── index.html          # Interface principal da aplicação
 ├── style.css           # Estilos
 ├── script.js           # Lógica JS para fazer as requisições e exibir os dados
 ├── img/                # Imagens 
 └── README.md
-
+```
 📋 Funcionalidades
 
   - Digitar um endereço de carteira (wallet address) para consultar dados da blockchain
